@@ -1,0 +1,27 @@
+
+{% extends "layout.html" %}
+{% block title %}AI Chatbot{% endblock %}
+
+{% block content %}
+
+<div class="chatbot-container" style="max-width: 700px; margin: 20px auto;">
+    <h1 style="color: var(--primary-color); margin-bottom: 15px; text-align: center;">Gemini AI Chatbot</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 10px;">Ask general knowledge questions. This chatbot does not have access to real school database data (marks, personal details).</p>
+
+    <!-- Hidden element to pass the API key to JavaScript -->
+    <div id="gemini-api-key" data-key="{{ gemini_api_key }}" style="display: none;"></div>
+    
+    <div id="chat-history" class="chat-history">
+        <div class="message gemini-message">Hello! I am the School Portal AI, powered by Google Gemini. How can I help you today?</div>
+        <!-- Chat messages will be appended here -->
+    </div>
+    
+    <div id="loading-indicator" class="loading-indicator" style="display: none;">AI is typing...</div>
+
+    <form id="chat-form" class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Ask your question..." required autocomplete="off">
+        <button type="submit" id="send-button">Send</button>
+    </form>
+</div>
+
+{% endblock %}

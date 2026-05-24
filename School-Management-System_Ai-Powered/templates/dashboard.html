@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="main-content">
+    <h1 style="color: var(--primary-color); margin-bottom: 20px;">Welcome, {{ session.get('name') }} ({{ role.capitalize() }})</h1>
+    
+    {% if role == 'admin' %}
+        <h2>Admin Overview</h2>
+        
+        <div class="dashboard-grid">
+            <div class="card stat-box">
+                <div class="number">{{ data.student_count }}</div>
+                <div class="label">Total Students</div>
+            </div>
+            <div class="card stat-box">
+                <div class="number">{{ data.teacher_count }}</div>
+                <div class="label">Total Teachers</div>
+            </div>
+            <div class="card stat-box">
+                <div class="number">{{ data.subjects|length }}</div>
+                <div class="label">Total Subjects</div>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: var(--text-dark);">Admin Management Panel</h3>
+
+        <!-- Add Student Form -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Add New Student</h3>
+            <form method="POST" action="{{ url_for('add_student') }}">
+                <div class="dashboard-grid" style="gap: 10px;">
+                    <div class="form-group">
+                        <input type="text" name="student_name" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password (for login)" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="roll_number" placeholder="Roll Number (Unique)" required>
+                    </div>
+                    <div class="form-group">
+                        <select name="class_name" required>
+                            <option value="">Select Class</option>
+                            <option value="11th">11th</option>
+                            <option value="12th">12th</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="stream" required>
+                            <option value="">Select Stream</option>
+                            <option value="Science">Science</option>
+                            <option value="Commerce">Commerce</option>
+                            <option value="Arts">Arts</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="section" required>
+                            <option value="">Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button" style="margin-top: 15px;">Add Student</button>
+            </form>
+        </div>
+
+        <!-- Add Teacher Form -->
+        <div class="card" style="margin-top: 30px;">
+            <h3>Add New Teacher</h3>
+            <form method="POST" action="{{ url_for('add_teacher') }}">
+                <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div class="form-group">
+                        <input type="text" name="teacher_name" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password (for login)" required>
+                    </div>
+                    <div class="form-group">
+                        <select name="subject_id" required>
+                            <option value="">Assign Subject</option>
+                            {% for subject in data.subjects %}
+                                <option value="{{ subject.id }}">{{ subject.subject_name }} ({{ subject.stream }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button" style="margin-top: 15px;">Add Teacher</button>
+            </form>
+        </div>
+
+    {% elif role == 'student' %}
+        <h2>My Profile</h2>
+        {% if data.student %}
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="card"><strong>Name:</strong> {{ data.student.student_name }}</div>
+                <div class="card"><strong>Email:</strong> {{ session.get('email') }}</div>
+                <div class="card"><strong>Class:</strong> {{ data.student.class_name }} - {{ data.student.section }}</div>
+                <div class="card"><strong>Roll No:</strong> {{ data.student.roll_number }}</div>
+            </div>
+            <div class="card" style="margin-top: 30px; text-align: center;">
+                <h3>Quick Link</h3>
+                <p>View your detailed marks report and download your CSV.</p>
+                <a href="{{ url_for('marks_page') }}" class="submit-button" style="display: block; width: auto; margin: 15px auto 0;">Go to Marks Report</a>
+            </div>
+        {% else %}
+            <div class="card error">
+                <p>Your student profile is incomplete. Please contact the administrator.</p>
+            </div>
+        {% endif %}
+
+    {% elif role == 'teacher' %}
+        <h2>My Assignments</h2>
+        {% if data.teacher %}
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="card"><strong>Name:</strong> {{ data.teacher.teacher_name }}</div>
+                <div class="card"><strong>Email:</strong> {{ session.get('email') }}</div>
+                <div class="card"><strong>Subject Taught:</strong> {{ data.teacher.subject_name }}</div>
+                <div class="card"><strong>Stream:</strong> {{ data.teacher.stream }}</div>
+            </div>
+            <div class="card" style="margin-top: 30px; text-align: center;">
+                <h3>Quick Link</h3>
+                <p>Manage and enter marks for your students.</p>
+                <a href="{{ url_for('marks_page') }}" class="submit-button" style="display: block; width: auto; margin: 15px auto 0;">Go to Marks Management</a>
+            </div>
+        {% else %}
+             <div class="card error">
+                <p>Your teacher profile is incomplete or not assigned a subject. Please contact the administrator.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+
+{% endblock %}

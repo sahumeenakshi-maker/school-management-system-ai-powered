@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management Portal - {% block title %}{% endblock %}</title>
+    <!-- Use Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <!-- Container for Custom Alerts (used by script.js) -->
+    <div id="custom-alert-container"></div>
+
+    <header class="navbar">
+        <div class="logo-text">School Portal</div>
+        <nav class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('marks_page') }}">Marks/Report</a>
+            <a href="{{ url_for('chatbot_page') }}">Chatbot</a>
+        </nav>
+        
+        {% if session.get('user_id') %}
+            <form action="{{ url_for('logout') }}" method="get">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        {% else %}
+            <button id="auth-button" class="auth-button">Login / Signup</button>
+        {% endif %}
+    </header>
+
+    <div class="container">
+        <!-- Flash messages will be handled and displayed by script.js -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}" style="display: none;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

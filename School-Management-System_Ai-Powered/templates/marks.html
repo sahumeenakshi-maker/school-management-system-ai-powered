@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block title %}Marks & Reports{% endblock %}
+
+{% block content %}
+
+<div class="main-content">
+    <h1 style="color: var(--primary-color); margin-bottom: 20px;">Academic Performance & Reports</h1>
+
+    {% if role == 'student' %}
+        <!-- Student View: Shows own marks -->
+        <h2>My Detailed Marks Report</h2>
+        
+        <table class="data-table" style="margin-top: 30px;">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Marks Obtained</th>
+                    <th>Total Marks</th>
+                </tr>
+            </thead>
+            <tbody id="marks-table-body">
+                {% for mark in data.marks %}
+                    <tr>
+                        <td>{{ mark.subject_name }}</td>
+                        <td>{{ mark.marks_obtained }}</td>
+                        <td>{{ mark.total_marks }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">No marks recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if data.marks %}
+            <div class="card" style="margin-top: 20px; text-align: right; background-color: #f3f0ff;">
+                <strong>Overall Percentage:</strong> <span id="total-percentage" style="font-size: 1.2rem; color: var(--primary-color); font-weight: 700;">{{ "%.2f"|format(data.percentage) }}%</span>
+                <a href="{{ url_for('download_marks', student_id=data.student_id) }}" class="submit-button" style="width: auto; display: inline-block; margin-left: 20px; padding: 8px 15px; font-size: 0.9rem;">Download CSV</a>
+            </div>
+        {% endif %}
+
+    {% elif role == 'admin' or role == 'teacher' %}
+        <!-- Admin/Teacher View: Marks Management -->
+        <h2>Marks Management & Download</h2>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <h3>Select Student to View/Download Marks</h3>
+            <div class="form-group">
+                <select id="student-select-marks" class="student-select" style="width: 100%;">
+                    <option value="">-- Select a Student --</option>
+                    {% for student in data.students %}
+                        <option value="{{ student.id }}">{{ student.student_name }} ({{ student.class_name }} - {{ student.section }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Download Button (controlled by JS) -->
+            <a id="download-marks-link" href="#" class="submit-button" style="width: auto; display: none; margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">
+                Download Student Report (CSV)
+            </a>
+            
+            <div style="margin-top: 20px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Marks Obtained</th>
+                            <th>Total Marks (100)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marks-table-body">
+                        <tr><td colspan="3">Select a student above to see their marks table and percentage.</td></tr>
+                    </tbody>
+                </table>
+                <div class="card" style="margin-top: 10px; text-align: right; background-color: #f3f0ff; padding: 10px;">
+                    <strong>Overall Percentage:</strong> <span id="total-percentage" style="font-size: 1.2rem; color: var(--primary-color); font-weight: 700;">N/A</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Update Marks Form -->
+        <div class="card" style="margin-top: 30px;">
+            <h3>Add / Update Student Marks</h3>
+            <form method="POST" action="{{ url_for('add_marks') }}">
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 2fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <select name="student_id" required>
+                            <option value="">Select Student</option>
+                            {% for student in data.students %}
+                                <option value="{{ student.id }}">{{ student.student_name }} ({{ student.roll_number }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="subject_id" required>
+                            <option value="">Select Subject</option>
+                            {% for subject in data.subjects %}
+                                <option value="{{ subject.id }}">{{ subject.subject_name }} ({{ subject.stream }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="marks_obtained" placeholder="Marks (0-100)" min="0" max="100" required>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button" style="margin-top: 15px;">Save Marks</button>
+            </form>
+        </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}
